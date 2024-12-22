@@ -11,13 +11,26 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
+      // Clear the session first to prevent multiple logout attempts
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      
+      if (error) {
+        // If it's a user_not_found error, we can safely ignore it and proceed with navigation
+        if (error.message.includes('user_not_found')) {
+          navigate('/');
+          toast.success("Logged out successfully");
+          return;
+        }
+        throw error;
+      }
+
       toast.success("Logged out successfully");
-      navigate("/");
+      navigate('/');
     } catch (error) {
-      toast.error("Error logging out");
       console.error("Logout error:", error);
+      // Even if there's an error, we should still redirect the user
+      navigate('/');
+      toast.error("Error during logout, but you've been redirected to home");
     }
   };
 
