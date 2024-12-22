@@ -4,7 +4,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -19,11 +18,11 @@ const menuItems = [
 
 export function LMSSidebar() {
   return (
-    <Sidebar variant="inset" collapsible="none" className="h-16 border-b">
+    <Sidebar variant="inset" collapsible="none" className="h-16 border-b px-4">
       <SidebarContent className="h-full py-0">
         <SidebarGroup className="h-full">
           <SidebarGroupContent>
-            <SidebarMenu className="flex-row h-full items-center justify-center gap-4">
+            <SidebarMenu className="flex-row h-full items-center justify-start gap-8">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
