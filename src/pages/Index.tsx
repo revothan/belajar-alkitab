@@ -6,7 +6,7 @@ import { NotesEditor } from "@/components/NotesEditor";
 const Index = () => {
   return (
     <LMSLayout>
-      <div className="p-6 space-y-6">
+      <div className="container max-w-7xl py-6 space-y-6">
         <header className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">Session 1</p>
           <h1 className="text-3xl font-bold">What on Earth Is the Hebrew Bible?</h1>
