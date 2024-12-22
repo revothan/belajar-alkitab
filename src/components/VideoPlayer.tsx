@@ -12,10 +12,11 @@ export function VideoPlayer({ src, className }: VideoPlayerProps) {
   const [isMuted, setIsMuted] = useState(false);
   const videoRef = useRef<HTMLIFrameElement>(null);
 
-  // Extract YouTube video ID from URL
+  // Extract YouTube video ID from URL (handles both standard and live URLs)
   const getYouTubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
+    // Handle live URLs
+    const liveRegExp = /^.*(youtu.be\/live\/|v\/|u\/\w\/|live\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(liveRegExp);
     return match && match[2].length === 11 ? match[2] : null;
   };
 
