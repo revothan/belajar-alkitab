@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { MoreVertical, PlayCircle, Play } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Session {
   id: number;
@@ -65,6 +66,8 @@ const currentModule: Module = {
 };
 
 const Modules = () => {
+  const navigate = useNavigate();
+
   return (
     <LMSLayout>
       <div className="container py-6 space-y-6">
@@ -77,16 +80,32 @@ const Modules = () => {
           <Button variant="outline" size="sm">Share Class</Button>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Progress value={currentModule.progress} className="w-32" />
-          <span className="text-sm text-muted-foreground">{currentModule.progress}% Complete</span>
+        <div className="space-y-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <Progress value={currentModule.progress} className="w-32" />
+              <span className="text-sm text-muted-foreground">{currentModule.progress}% Complete</span>
+            </div>
+            <Button 
+              size="sm" 
+              className="gap-1.5 w-fit"
+              onClick={() => navigate('/')}
+            >
+              <Play className="h-3 w-3" />
+              Begin Session 1
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Sessions</h2>
           <div className="grid gap-4">
             {currentModule.sessions.map((session) => (
-              <Card key={session.id}>
+              <Card 
+                key={session.id}
+                className="cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() => navigate('/')}
+              >
                 <CardHeader className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex gap-3">
@@ -99,17 +118,9 @@ const Modules = () => {
                         <p className="text-sm text-muted-foreground">{session.description}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {session.id === 1 && (
-                        <Button size="sm" className="gap-1.5">
-                          <Play className="h-3 w-3" />
-                          Begin Session 1
-                        </Button>
-                      )}
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
