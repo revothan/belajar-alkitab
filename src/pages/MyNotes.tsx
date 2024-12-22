@@ -14,7 +14,8 @@ const MyNotes = () => {
         .select(`
           *,
           module:modules(title),
-          session:sessions(title)
+          session:sessions(title),
+          timestamp:session_timestamps(timestamp_seconds)
         `)
         .order('created_at', { ascending: false });
 
@@ -22,6 +23,12 @@ const MyNotes = () => {
       return data;
     },
   });
+
+  const formatTimestamp = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   if (isLoading) {
     return (
@@ -44,6 +51,7 @@ const MyNotes = () => {
               <TableRow>
                 <TableHead>Module</TableHead>
                 <TableHead>Session</TableHead>
+                <TableHead>Timestamp</TableHead>
                 <TableHead>Note</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
@@ -53,13 +61,19 @@ const MyNotes = () => {
                 <TableRow key={note.id}>
                   <TableCell>{note.module?.title}</TableCell>
                   <TableCell>{note.session?.title}</TableCell>
+                  <TableCell>
+                    {note.timestamp?.timestamp_seconds 
+                      ? formatTimestamp(note.timestamp.timestamp_seconds)
+                      : '-'
+                    }
+                  </TableCell>
                   <TableCell className="max-w-md truncate">{note.content}</TableCell>
                   <TableCell>{format(new Date(note.created_at), 'PPp')}</TableCell>
                 </TableRow>
               ))}
               {notes?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                     No notes found
                   </TableCell>
                 </TableRow>
