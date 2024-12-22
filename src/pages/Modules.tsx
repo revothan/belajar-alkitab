@@ -2,7 +2,7 @@ import { LMSLayout } from "@/components/LMSLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { MoreVertical, PlayCircle } from "lucide-react";
+import { MoreVertical, PlayCircle, Play } from "lucide-react";
 
 interface Session {
   id: number;
@@ -99,9 +99,17 @@ const Modules = () => {
                         <p className="text-sm text-muted-foreground">{session.description}</p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {session.id === 1 && (
+                        <Button size="sm" className="gap-1.5">
+                          <Play className="h-3 w-3" />
+                          Begin Session 1
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
