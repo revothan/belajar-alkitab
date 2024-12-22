@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/lazy";
 
 interface VideoPlayerProps {
   src: string;
