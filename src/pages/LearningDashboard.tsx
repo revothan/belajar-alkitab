@@ -13,6 +13,7 @@ const LearningDashboard = () => {
   const moduleId = searchParams.get('moduleId');
   const sessionId = searchParams.get('sessionId');
   const [currentSlideUrl, setCurrentSlideUrl] = useState<string | null>(null);
+  const [currentTimestampId, setCurrentTimestampId] = useState<string | null>(null);
 
   const { data: session, isLoading } = useQuery({
     queryKey: ["session", sessionId],
@@ -61,6 +62,7 @@ const LearningDashboard = () => {
 
     if (currentTimestamp?.slide_url) {
       setCurrentSlideUrl(currentTimestamp.slide_url);
+      setCurrentTimestampId(currentTimestamp.id);
     }
   };
 
@@ -123,7 +125,7 @@ const LearningDashboard = () => {
           />
         </div>
 
-        <NotesEditor className="w-full" />
+        <NotesEditor className="w-full" currentTimestampId={currentTimestampId} />
       </div>
     </LMSLayout>
   );

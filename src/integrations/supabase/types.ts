@@ -36,6 +36,58 @@ export type Database = {
         }
         Relationships: []
       }
+      session_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          module_id: string
+          session_id: string
+          timestamp_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          module_id: string
+          session_id: string
+          timestamp_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          module_id?: string
+          session_id?: string
+          timestamp_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_notes_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_timestamp_id_fkey"
+            columns: ["timestamp_id"]
+            isOneToOne: false
+            referencedRelation: "session_timestamps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_timestamps: {
         Row: {
           created_at: string
