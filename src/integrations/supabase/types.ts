@@ -36,6 +36,41 @@ export type Database = {
         }
         Relationships: []
       }
+      session_timestamps: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string
+          slide_url: string | null
+          timestamp_seconds: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id: string
+          slide_url?: string | null
+          timestamp_seconds: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string
+          slide_url?: string | null
+          timestamp_seconds?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_timestamps_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           created_at: string

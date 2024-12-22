@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TimestampManager } from "./TimestampManager";
 
 interface Session {
   id: string;
@@ -25,7 +26,7 @@ export const SessionCard = ({ session, index }: SessionCardProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="space-y-4">
           {session.thumbnail_url && (
             <img
               src={session.thumbnail_url}
@@ -61,6 +62,10 @@ export const SessionCard = ({ session, index }: SessionCardProps) => {
                 ))}
               </ul>
             </div>
+          )}
+          
+          {session.youtube_url && (
+            <TimestampManager sessionId={session.id} />
           )}
         </div>
       </CardContent>
