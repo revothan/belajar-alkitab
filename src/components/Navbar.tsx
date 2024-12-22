@@ -4,31 +4,31 @@ import { Button } from "./ui/button";
 export function Navbar() {
   return (
     <nav className="w-full border-b bg-background">
-      <div className="container flex h-16 items-center px-4">
-        <div className="flex gap-6 md:gap-10">
-          <Button variant="ghost" className="gap-2">
-            <FileText className="h-4 w-4" />
-            My Notes
+      <div className="container flex h-12 items-center px-2">
+        <div className="flex gap-2 md:gap-4 overflow-x-auto">
+          <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+            <FileText className="h-3 w-3" />
+            <span className="text-xs">My Notes</span>
           </Button>
-          <Button variant="ghost" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Teacher Note
+          <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+            <BookOpen className="h-3 w-3" />
+            <span className="text-xs">Teacher Note</span>
           </Button>
-          <Button variant="ghost" className="gap-2">
-            <Scroll className="h-4 w-4" />
-            Transcript
+          <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+            <Scroll className="h-3 w-3" />
+            <span className="text-xs">Transcript</span>
           </Button>
-          <Button variant="ghost" className="gap-2">
-            <Book className="h-4 w-4" />
-            Reflection
+          <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+            <Book className="h-3 w-3" />
+            <span className="text-xs">Reflection</span>
           </Button>
-          <Button variant="ghost" className="gap-2">
-            <Download className="h-4 w-4" />
-            Download
+          <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+            <Download className="h-3 w-3" />
+            <span className="text-xs">Download</span>
           </Button>
-          <Button variant="ghost" className="gap-2">
-            <User className="h-4 w-4" />
-            Profile
+          <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+            <User className="h-3 w-3" />
+            <span className="text-xs">Profile</span>
           </Button>
         </div>
       </div>
