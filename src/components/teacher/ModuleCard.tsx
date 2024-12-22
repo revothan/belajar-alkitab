@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/accordion";
 import { SessionCard } from "./SessionCard";
 import { CreateSessionForm } from "./CreateSessionForm";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -59,6 +59,7 @@ export const ModuleCard = ({
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const [isEditingModule, setIsEditingModule] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: sessions } = useQuery({
     queryKey: ["sessions", module.id],
@@ -74,10 +75,33 @@ export const ModuleCard = ({
     },
   });
 
+  useEffect(() => {
+    // Subscribe to real-time changes for sessions of this specific module
+    const sessionsChannel = supabase
+      .channel(`sessions-${module.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sessions',
+          filter: `module_id=eq.${module.id}`
+        },
+        () => {
+          // Invalidate and refetch sessions query for this module
+          queryClient.invalidateQueries({ queryKey: ["sessions", module.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(sessionsChannel);
+    };
+  }, [module.id, queryClient]);
+
   const handleSessionSuccess = () => {
     setIsCreatingSession(false);
     setSelectedModuleId(null);
-    onSessionCreate();
   };
 
   const handleModuleDelete = async () => {
@@ -182,8 +206,12 @@ export const ModuleCard = ({
                     key={session.id} 
                     session={session} 
                     index={index}
-                    onUpdate={onSessionCreate}
-                    onDelete={onSessionCreate}
+                    onUpdate={() => {
+                      queryClient.invalidateQueries({ queryKey: ["sessions", module.id] });
+                    }}
+                    onDelete={() => {
+                      queryClient.invalidateQueries({ queryKey: ["sessions", module.id] });
+                    }}
                   />
                 ))}
               </div>
