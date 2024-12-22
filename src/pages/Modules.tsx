@@ -70,7 +70,7 @@ const Modules = () => {
 
   return (
     <LMSLayout>
-      <div className="container py-6 space-y-6">
+      <div className="container max-w-4xl py-6 space-y-6">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <h4 className="text-sm font-medium text-muted-foreground">Module 1</h4>
