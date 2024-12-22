@@ -1,6 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { LMSSidebar } from "./LMSSidebar";
-import { NavBar } from "./NavBar";
 import { cn } from "@/lib/utils";
 
 interface LMSLayoutProps {
@@ -13,12 +12,9 @@ export function LMSLayout({ children, className }: LMSLayoutProps) {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <LMSSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <NavBar />
-          <main className={cn("flex-1 overflow-auto", className)}>
-            {children}
-          </main>
-        </div>
+        <main className={cn("flex-1 overflow-hidden", className)}>
+          {children}
+        </main>
       </div>
     </SidebarProvider>
   );
