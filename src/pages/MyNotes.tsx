@@ -1,11 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LMSLayout } from "@/components/LMSLayout";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 const MyNotes = () => {
+  const [editingNote, setEditingNote] = useState<any>(null);
+  const [editedContent, setEditedContent] = useState("");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const { data: notes, isLoading } = useQuery({
     queryKey: ["my-notes"],
     queryFn: async () => {
@@ -28,6 +39,62 @@ const MyNotes = () => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleEdit = (note: any) => {
+    setEditingNote(note);
+    setEditedContent(note.content);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const { error } = await supabase
+        .from("session_notes")
+        .update({ content: editedContent })
+        .eq("id", editingNote.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Note updated successfully",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["my-notes"] });
+      setEditingNote(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update note",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (noteId: string) => {
+    if (!window.confirm("Are you sure you want to delete this note?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("session_notes")
+        .delete()
+        .eq("id", noteId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Note deleted successfully",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["my-notes"] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete note",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
@@ -54,6 +121,7 @@ const MyNotes = () => {
                 <TableHead>Timestamp</TableHead>
                 <TableHead>Note</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -69,11 +137,29 @@ const MyNotes = () => {
                   </TableCell>
                   <TableCell className="max-w-md truncate">{note.content}</TableCell>
                   <TableCell>{format(new Date(note.created_at), 'PPp')}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEdit(note)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleDelete(note.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
               {notes?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                     No notes found
                   </TableCell>
                 </TableRow>
@@ -81,6 +167,29 @@ const MyNotes = () => {
             </TableBody>
           </Table>
         </div>
+
+        <Dialog open={!!editingNote} onOpenChange={(open) => !open && setEditingNote(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Note</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Textarea
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+                className="min-h-[200px]"
+              />
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditingNote(null)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleUpdate}>
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </LMSLayout>
   );
