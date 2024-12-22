@@ -10,10 +10,21 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const MyNotes = () => {
   const [editingNote, setEditingNote] = useState<any>(null);
   const [editedContent, setEditedContent] = useState("");
+  const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -72,8 +83,6 @@ const MyNotes = () => {
   };
 
   const handleDelete = async (noteId: string) => {
-    if (!window.confirm("Are you sure you want to delete this note?")) return;
-
     try {
       const { error } = await supabase
         .from("session_notes")
@@ -88,6 +97,7 @@ const MyNotes = () => {
       });
 
       queryClient.invalidateQueries({ queryKey: ["my-notes"] });
+      setNoteToDelete(null);
     } catch (error) {
       toast({
         title: "Error",
@@ -149,7 +159,7 @@ const MyNotes = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => handleDelete(note.id)}
+                        onClick={() => setNoteToDelete(note.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -190,6 +200,23 @@ const MyNotes = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        <AlertDialog open={!!noteToDelete} onOpenChange={(open) => !open && setNoteToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your note.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => noteToDelete && handleDelete(noteToDelete)}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </LMSLayout>
   );
