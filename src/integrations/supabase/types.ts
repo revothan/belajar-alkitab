@@ -66,6 +66,7 @@ export type Database = {
           session_id: string
           timestamp_id: string | null
           updated_at: string
+          user_id: string
         }
         Insert: {
           content: string
@@ -75,6 +76,7 @@ export type Database = {
           session_id: string
           timestamp_id?: string | null
           updated_at?: string
+          user_id: string
         }
         Update: {
           content?: string
@@ -84,6 +86,7 @@ export type Database = {
           session_id?: string
           timestamp_id?: string | null
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -105,6 +108,13 @@ export type Database = {
             columns: ["timestamp_id"]
             isOneToOne: false
             referencedRelation: "session_timestamps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_notes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

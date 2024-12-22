@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +28,7 @@ const MyNotes = () => {
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { session } = useAuth();
 
   const { data: notes, isLoading } = useQuery({
     queryKey: ["my-notes"],
@@ -44,6 +46,7 @@ const MyNotes = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !!session?.user?.id,
   });
 
   const formatTimestamp = (seconds: number) => {
@@ -58,10 +61,22 @@ const MyNotes = () => {
   };
 
   const handleUpdate = async () => {
+    if (!session?.user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update notes",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("session_notes")
-        .update({ content: editedContent })
+        .update({ 
+          content: editedContent,
+          user_id: session.user.id 
+        })
         .eq("id", editingNote.id);
 
       if (error) throw error;
@@ -83,6 +98,15 @@ const MyNotes = () => {
   };
 
   const handleDelete = async (noteId: string) => {
+    if (!session?.user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete notes",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("session_notes")
@@ -106,6 +130,16 @@ const MyNotes = () => {
       });
     }
   };
+
+  if (!session) {
+    return (
+      <LMSLayout>
+        <div className="container py-6">
+          <p className="text-center text-muted-foreground">Please log in to view your notes</p>
+        </div>
+      </LMSLayout>
+    );
+  }
 
   if (isLoading) {
     return (
