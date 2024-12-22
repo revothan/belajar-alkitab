@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { Pencil, Trash2, X, Check } from "lucide-react";
 
 interface TimestampManagerProps {
   sessionId: string;
@@ -18,6 +19,8 @@ interface Timestamp {
 export function TimestampManager({ sessionId }: TimestampManagerProps) {
   const [timestamp, setTimestamp] = useState("");
   const [slideImage, setSlideImage] = useState<File | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTimestamp, setEditTimestamp] = useState("");
   const { toast } = useToast();
 
   const { data: timestamps, refetch: refetchTimestamps } = useQuery({
@@ -88,6 +91,68 @@ export function TimestampManager({ sessionId }: TimestampManagerProps) {
     }
   };
 
+  const handleUpdateTimestamp = async (id: string) => {
+    try {
+      const [minutes, seconds] = editTimestamp.split(":").map(Number);
+      const timestampSeconds = minutes * 60 + seconds;
+
+      const { error } = await supabase
+        .from("session_timestamps")
+        .update({ timestamp_seconds: timestampSeconds })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Timestamp updated successfully",
+      });
+
+      setEditingId(null);
+      setEditTimestamp("");
+      refetchTimestamps();
+    } catch (error) {
+      console.error("Error updating timestamp:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update timestamp",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTimestamp = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("session_timestamps")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Timestamp deleted successfully",
+      });
+
+      refetchTimestamps();
+    } catch (error) {
+      console.error("Error deleting timestamp:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete timestamp",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startEditing = (timestamp: Timestamp) => {
+    const minutes = Math.floor(timestamp.timestamp_seconds / 60);
+    const seconds = timestamp.timestamp_seconds % 60;
+    setEditTimestamp(`${minutes}:${seconds.toString().padStart(2, "0")}`);
+    setEditingId(timestamp.id);
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Manage Timestamps</h3>
@@ -114,10 +179,52 @@ export function TimestampManager({ sessionId }: TimestampManagerProps) {
             key={ts.id}
             className="flex items-center gap-4 p-2 border rounded-lg"
           >
-            <span>
-              {Math.floor(ts.timestamp_seconds / 60)}:
-              {(ts.timestamp_seconds % 60).toString().padStart(2, "0")}
-            </span>
+            {editingId === ts.id ? (
+              <>
+                <Input
+                  value={editTimestamp}
+                  onChange={(e) => setEditTimestamp(e.target.value)}
+                  pattern="\d{1,2}:\d{2}"
+                  title="Format: mm:ss (e.g., 1:30)"
+                  className="w-24"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => handleUpdateTimestamp(ts.id)}
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setEditingId(null)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <span>
+                  {Math.floor(ts.timestamp_seconds / 60)}:
+                  {(ts.timestamp_seconds % 60).toString().padStart(2, "0")}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => startEditing(ts)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => handleDeleteTimestamp(ts.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            )}
             {ts.slide_url && (
               <img
                 src={ts.slide_url}
