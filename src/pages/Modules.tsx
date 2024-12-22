@@ -49,6 +49,9 @@ const Modules = () => {
     );
   }
 
+  // Sort sessions by order_index to ensure they're displayed in the correct order
+  const sortedSessions = currentModule.sessions?.sort((a, b) => a.order_index - b.order_index);
+
   return (
     <LMSLayout>
       <div className="container max-w-4xl py-6 space-y-6">
@@ -74,11 +77,11 @@ const Modules = () => {
               <Progress value={0} className="w-32" />
               <span className="text-sm text-muted-foreground">0% Complete</span>
             </div>
-            {currentModule.sessions?.[0] && (
+            {sortedSessions?.[0] && (
               <Button 
                 size="sm" 
                 className="gap-1.5 w-fit"
-                onClick={() => navigate(`/learning-dashboard?moduleId=${currentModule.id}&sessionId=${currentModule.sessions[0].id}`)}
+                onClick={() => navigate(`/learning-dashboard?moduleId=${currentModule.id}&sessionId=${sortedSessions[0].id}`)}
               >
                 <Play className="h-3 w-3" />
                 Begin Session 1
@@ -90,7 +93,7 @@ const Modules = () => {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Sessions</h2>
           <div className="grid gap-4">
-            {currentModule.sessions?.map((session, index) => (
+            {sortedSessions?.map((session, index) => (
               <Card 
                 key={session.id}
                 className="cursor-pointer hover:bg-accent/50 transition-colors"
