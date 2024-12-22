@@ -11,12 +11,20 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
-      // Clear the session first to prevent multiple logout attempts
+      // First check if we actually have a session
+      if (!session) {
+        navigate('/');
+        toast.success("Already logged out");
+        return;
+      }
+
       const { error } = await supabase.auth.signOut();
       
       if (error) {
-        // If it's a user_not_found error, we can safely ignore it and proceed with navigation
-        if (error.message.includes('user_not_found')) {
+        // If it's a user_not_found error or the session is invalid, 
+        // we can safely proceed with navigation
+        if (error.message.includes('user_not_found') || 
+            error.message.includes('invalid_jwt')) {
           navigate('/');
           toast.success("Logged out successfully");
           return;
