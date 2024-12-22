@@ -10,6 +10,7 @@ interface Session {
   title: string;
   description: string;
   duration: string;
+  thumbnail: string;
 }
 
 interface Module {
@@ -17,6 +18,7 @@ interface Module {
   title: string;
   description: string;
   progress: number;
+  thumbnail: string;
   sessions: Session[];
 }
 
@@ -25,42 +27,49 @@ const currentModule: Module = {
   title: "The Shape of the Hebrew Bible",
   description: "What is the Hebrew Bible? Explore this and how it's organized as the TaNaK.",
   progress: 3,
+  thumbnail: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
   sessions: [
     {
       id: 1,
       title: "What on Earth Is the Hebrew Bible?",
       description: "Acknowledge and embrace both your own assumptions and the authors' intentions of a given text.",
-      duration: "22 Minutes"
+      duration: "22 Minutes",
+      thumbnail: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6"
     },
     {
       id: 2,
       title: "How Jesus and the Apostles Read Their Bibles",
       description: "What was the Hebrew Bible that Jesus and the Apostles read? What was all about? Discover what they believed to be the main essence of the Hebrew Bible.",
-      duration: "25 Minutes"
+      duration: "25 Minutes",
+      thumbnail: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"
     },
     {
       id: 3,
       title: "The Ancient Shape of Scriptures",
       description: "Study the ancient shape of the Hebrew Bible and why this organization is significant for readers today.",
-      duration: "28 Minutes"
+      duration: "28 Minutes",
+      thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
     },
     {
       id: 4,
       title: "Seams Between Texts in the Dead Sea Scrolls",
       description: "What do the seams of the Dead Sea Scrolls teach us about the Hebrew Bible? Jump in and find out!",
-      duration: "31 Minutes"
+      duration: "31 Minutes",
+      thumbnail: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7"
     },
     {
       id: 5,
       title: "The Prophet to Come: The Seams of the Torah and Prophets",
       description: "Trace the seams of the Torah and the Prophets to discover a message about an anticipated future hope.",
-      duration: "32 Minutes"
+      duration: "32 Minutes",
+      thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085"
     },
     {
       id: 6,
       title: "The Prophet to Come: Psalms 1 and 2",
       description: "Gain further insight into how Psalms 1 and 2 build onto the portrait of the promised prophet who will rescue humanity.",
-      duration: "28 Minutes"
+      duration: "28 Minutes",
+      thumbnail: "https://images.unsplash.com/photo-1483058712412-4245e9b90334"
     }
   ]
 };
@@ -71,8 +80,15 @@ const Modules = () => {
   return (
     <LMSLayout>
       <div className="container max-w-4xl py-6 space-y-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
+        <div className="flex items-start gap-6">
+          <div className="w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
+            <img 
+              src={currentModule.thumbnail} 
+              alt={currentModule.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex-1 space-y-1">
             <h4 className="text-sm font-medium text-muted-foreground">Module 1</h4>
             <h1 className="text-2xl font-bold">{currentModule.title}</h1>
             <p className="text-sm text-muted-foreground">{currentModule.description}</p>
@@ -107,10 +123,14 @@ const Modules = () => {
                 onClick={() => navigate('/')}
               >
                 <CardHeader className="p-4">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex gap-3">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <PlayCircle className="h-6 w-6 text-primary" />
+                      <div className="w-24 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                        <img 
+                          src={session.thumbnail} 
+                          alt={session.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="space-y-1">
                         <h3 className="font-medium">Session {session.id}</h3>
