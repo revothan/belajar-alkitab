@@ -76,6 +76,8 @@ const TeacherDashboard = () => {
               key={module.id}
               module={module}
               onSessionCreate={refetchModules}
+              onModuleUpdate={refetchModules}
+              onModuleDelete={refetchModules}
             />
           ))}
         </div>
