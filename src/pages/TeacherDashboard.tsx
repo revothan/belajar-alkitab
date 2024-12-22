@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { LMSLayout } from "@/components/LMSLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Upload, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Accordion,
   AccordionContent,
@@ -36,6 +38,8 @@ interface Session {
 }
 
 const TeacherDashboard = () => {
+  const navigate = useNavigate();
+  const { session, isLoading } = useAuth();
   const [isCreatingModule, setIsCreatingModule] = useState(false);
   const [moduleTitle, setModuleTitle] = useState("");
   const [moduleDescription, setModuleDescription] = useState("");
@@ -52,6 +56,12 @@ const TeacherDashboard = () => {
   });
   const [sessionImage, setSessionImage] = useState<File | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!isLoading && !session) {
+      navigate("/login");
+    }
+  }, [session, isLoading, navigate]);
 
   const { data: modules, refetch: refetchModules } = useQuery({
     queryKey: ["modules"],
@@ -215,6 +225,14 @@ const TeacherDashboard = () => {
       reflection_questions: newQuestions,
     });
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!session) {
+    return null;
+  }
 
   return (
     <LMSLayout>
