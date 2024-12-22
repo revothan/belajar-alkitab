@@ -13,7 +13,7 @@ export const PrivateRoute = ({ children, requireTeacher = false }: PrivateRouteP
   const { session, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["profile", session?.user?.id],
     queryFn: async () => {
       if (!session?.user?.id) return null;
@@ -21,7 +21,7 @@ export const PrivateRoute = ({ children, requireTeacher = false }: PrivateRouteP
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -30,24 +30,27 @@ export const PrivateRoute = ({ children, requireTeacher = false }: PrivateRouteP
   });
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !isProfileLoading) {
       if (!session) {
         navigate("/login");
-      } else if (requireTeacher && profile?.role !== "teacher") {
+      } else if (!profile) {
+        // If no profile exists, redirect to login
+        navigate("/login");
+      } else if (requireTeacher && profile.role !== "teacher") {
         navigate("/");
       }
     }
-  }, [session, isLoading, navigate, requireTeacher, profile]);
+  }, [session, isLoading, navigate, requireTeacher, profile, isProfileLoading]);
 
-  if (isLoading) {
+  if (isLoading || isProfileLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!session) {
+  if (!session || !profile) {
     return null;
   }
 
-  if (requireTeacher && profile?.role !== "teacher") {
+  if (requireTeacher && profile.role !== "teacher") {
     return null;
   }
 
