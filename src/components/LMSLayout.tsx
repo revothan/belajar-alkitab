@@ -1,6 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Navbar } from "./Navbar";
+import { Footer } from "./Footer";
 
 interface LMSLayoutProps {
   children: React.ReactNode;
@@ -12,9 +13,10 @@ export function LMSLayout({ children, className }: LMSLayoutProps) {
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full bg-background">
         <Navbar />
-        <main className={cn("flex-1 overflow-hidden", className)}>
+        <main className={cn("flex-1 overflow-hidden py-20", className)}>
           {children}
         </main>
+        <Footer />
       </div>
     </SidebarProvider>
   );
