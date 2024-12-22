@@ -11,16 +11,16 @@ const Login = () => {
 
   useEffect(() => {
     if (session) {
-      navigate("/teacher-dashboard");
+      navigate("/");
     }
   }, [session, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="max-w-md w-full space-y-8 p-8 bg-card rounded-lg shadow-lg">
         <div className="text-center">
           <h2 className="text-3xl font-bold">Welcome Back</h2>
-          <p className="mt-2 text-gray-600">Please sign in to continue</p>
+          <p className="mt-2 text-muted-foreground">Please sign in to continue</p>
         </div>
         <Auth
           supabaseClient={supabase}
