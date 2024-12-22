@@ -9,6 +9,7 @@ import Modules from "./pages/Modules";
 import LearningDashboard from "./pages/LearningDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import Login from "./pages/Login";
+import MyNotes from "./pages/MyNotes";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/learning-dashboard" element={<LearningDashboard />} />
             <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/my-notes" element={<MyNotes />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

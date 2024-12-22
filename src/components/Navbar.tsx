@@ -1,12 +1,20 @@
 import { FileText, BookOpen, Scroll, Book, Download, User } from "lucide-react";
 import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 
 export function Navbar() {
+  const navigate = useNavigate();
+
   return (
     <nav className="w-full border-b bg-background">
       <div className="container flex h-12 items-center px-2 justify-end">
         <div className="flex gap-2 md:gap-4 overflow-x-auto">
-          <Button variant="ghost" size="sm" className="gap-1.5 h-8">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-1.5 h-8"
+            onClick={() => navigate('/my-notes')}
+          >
             <FileText className="h-3 w-3" />
             <span className="text-xs">My Notes</span>
           </Button>
