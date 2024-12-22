@@ -7,9 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 const Modules = () => {
   const navigate = useNavigate();
+  const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [expandedSessions, setExpandedSessions] = useState<{ [key: string]: boolean }>({});
 
   const { data: modules, isLoading: isLoadingModules } = useQuery({
     queryKey: ["modules"],
@@ -52,10 +55,17 @@ const Modules = () => {
   // Sort sessions by order_index to ensure they're displayed in the correct order
   const sortedSessions = currentModule.sessions?.sort((a, b) => a.order_index - b.order_index);
 
+  const toggleSessionDescription = (sessionId: string) => {
+    setExpandedSessions((prev) => ({
+      ...prev,
+      [sessionId]: !prev[sessionId],
+    }));
+  };
+
   return (
     <LMSLayout>
       <div className="container max-w-4xl py-6 space-y-6">
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col md:flex-row items-start gap-6">
           <div className="w-32 h-24 rounded-lg overflow-hidden flex-shrink-0">
             <img 
               src={currentModule.thumbnail_url || "/placeholder.svg"} 
@@ -66,7 +76,17 @@ const Modules = () => {
           <div className="flex-1 space-y-1">
             <h4 className="text-sm font-medium text-muted-foreground">Module 1</h4>
             <h1 className="text-2xl font-bold">{currentModule.title}</h1>
-            <p className="text-sm text-muted-foreground">{currentModule.description}</p>
+            <p className={`text-sm text-muted-foreground ${isDescriptionExpanded ? "" : "line-clamp-2"}`}>
+              {currentModule.description}
+            </p>
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="p-0"
+              onClick={() => setDescriptionExpanded(prev => !prev)}
+            >
+              {isDescriptionExpanded ? "Show Less" : "Read More"}
+            </Button>
           </div>
           <Button variant="outline" size="sm">Share Class</Button>
         </div>
@@ -112,7 +132,17 @@ const Modules = () => {
                       <div className="space-y-1">
                         <h3 className="font-medium">Session {index + 1}</h3>
                         <h4 className="font-medium">{session.title}</h4>
-                        <p className="text-sm text-muted-foreground">{session.description}</p>
+                        <p className={`text-sm text-muted-foreground ${expandedSessions[session.id] ? "" : "line-clamp-2"}`}>
+                          {session.description}
+                        </p>
+                        <Button 
+                          variant="link" 
+                          size="sm" 
+                          className="p-0"
+                          onClick={() => toggleSessionDescription(session.id)}
+                        >
+                          {expandedSessions[session.id] ? "Show Less" : "Read More"}
+                        </Button>
                       </div>
                     </div>
                     <Button variant="ghost" size="icon">

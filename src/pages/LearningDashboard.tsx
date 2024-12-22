@@ -4,11 +4,14 @@ import { SlideViewer } from "@/components/SlideViewer";
 import { NotesEditor } from "@/components/NotesEditor";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const LearningDashboard = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const moduleId = searchParams.get('moduleId');
   const sessionId = searchParams.get('sessionId');
@@ -96,36 +99,46 @@ const LearningDashboard = () => {
 
   return (
     <LMSLayout>
-      <div className="container max-w-7xl py-6 space-y-6">
-        <header className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">Session {session.order_index}</p>
-          <h1 className="text-3xl font-bold">{session.title}</h1>
-          <div className="flex items-center gap-2">
-            <img
-              src={session.module?.thumbnail_url || "/placeholder.svg"}
-              alt="Course thumbnail"
-              className="w-8 h-8 rounded"
-            />
-            <div>
-              <h2 className="font-medium">{session.module?.title}</h2>
-              <p className="text-sm text-muted-foreground">Teacher Name</p>
+      <div className="container max-w-7xl py-6">
+        <div className="space-y-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/modules')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Modules
+          </Button>
+
+          <header className="space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">Session {session.order_index}</p>
+            <h1 className="text-3xl font-bold">{session.title}</h1>
+            <div className="flex items-center gap-2">
+              <img
+                src={session.module?.thumbnail_url || "/placeholder.svg"}
+                alt="Course thumbnail"
+                className="w-8 h-8 rounded"
+              />
+              <div>
+                <h2 className="font-medium">{session.module?.title}</h2>
+                <p className="text-sm text-muted-foreground">Teacher Name</p>
+              </div>
             </div>
+          </header>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            <VideoPlayer
+              src={session.youtube_url || ""}
+              className="aspect-video"
+              onTimeUpdate={handleTimeUpdate}
+            />
+            <SlideViewer
+              src={currentSlideUrl || session.slides_url || "/placeholder.svg"}
+              className="aspect-video"
+            />
           </div>
-        </header>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          <VideoPlayer
-            src={session.youtube_url || ""}
-            className="aspect-video"
-            onTimeUpdate={handleTimeUpdate}
-          />
-          <SlideViewer
-            src={currentSlideUrl || session.slides_url || "/placeholder.svg"}
-            className="aspect-video"
-          />
+          <NotesEditor className="w-full" currentTimestampId={currentTimestampId} />
         </div>
-
-        <NotesEditor className="w-full" currentTimestampId={currentTimestampId} />
       </div>
     </LMSLayout>
   );
