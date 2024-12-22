@@ -4,7 +4,7 @@ import { LMSLayout } from "@/components/LMSLayout";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { CreateModuleForm } from "@/components/teacher/CreateModuleForm";
 import { ModuleCard } from "@/components/teacher/ModuleCard";
@@ -20,6 +20,7 @@ const TeacherDashboard = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useAuth();
   const [isCreatingModule, setIsCreatingModule] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isLoading && !session) {
@@ -27,7 +28,49 @@ const TeacherDashboard = () => {
     }
   }, [session, isLoading, navigate]);
 
-  const { data: modules, refetch: refetchModules } = useQuery({
+  useEffect(() => {
+    // Subscribe to real-time changes for modules
+    const modulesChannel = supabase
+      .channel('modules-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'modules'
+        },
+        () => {
+          // Invalidate and refetch modules query
+          queryClient.invalidateQueries({ queryKey: ['modules'] });
+        }
+      )
+      .subscribe();
+
+    // Subscribe to real-time changes for sessions
+    const sessionsChannel = supabase
+      .channel('sessions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sessions'
+        },
+        () => {
+          // Invalidate and refetch modules query to update sessions
+          queryClient.invalidateQueries({ queryKey: ['modules'] });
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions
+    return () => {
+      supabase.removeChannel(modulesChannel);
+      supabase.removeChannel(sessionsChannel);
+    };
+  }, [queryClient]);
+
+  const { data: modules, isLoading: isLoadingModules } = useQuery({
     queryKey: ["modules"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -42,7 +85,6 @@ const TeacherDashboard = () => {
 
   const handleModuleSuccess = () => {
     setIsCreatingModule(false);
-    refetchModules();
   };
 
   if (isLoading) {
@@ -75,9 +117,9 @@ const TeacherDashboard = () => {
             <ModuleCard
               key={module.id}
               module={module}
-              onSessionCreate={refetchModules}
-              onModuleUpdate={refetchModules}
-              onModuleDelete={refetchModules}
+              onSessionCreate={() => {}}
+              onModuleUpdate={() => {}}
+              onModuleDelete={() => {}}
             />
           ))}
         </div>
