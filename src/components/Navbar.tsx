@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 export function Navbar() {
   return (
     <nav className="w-full border-b bg-background">
-      <div className="container flex h-12 items-center px-2">
+      <div className="container flex h-12 items-center px-2 justify-end">
         <div className="flex gap-2 md:gap-4 overflow-x-auto">
           <Button variant="ghost" size="sm" className="gap-1.5 h-8">
             <FileText className="h-3 w-3" />
