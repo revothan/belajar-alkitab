@@ -6,11 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState, useEffect } from "react";
 
 const LearningDashboard = () => {
   const [searchParams] = useSearchParams();
   const moduleId = searchParams.get('moduleId');
   const sessionId = searchParams.get('sessionId');
+  const [currentSlideUrl, setCurrentSlideUrl] = useState<string | null>(null);
 
   const { data: session, isLoading } = useQuery({
     queryKey: ["session", sessionId],
@@ -31,6 +33,43 @@ const LearningDashboard = () => {
     },
     enabled: !!sessionId,
   });
+
+  const { data: timestamps } = useQuery({
+    queryKey: ["timestamps", sessionId],
+    queryFn: async () => {
+      if (!sessionId) return null;
+      
+      const { data, error } = await supabase
+        .from("session_timestamps")
+        .select("*")
+        .eq("session_id", sessionId)
+        .order("timestamp_seconds", { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!sessionId,
+  });
+
+  const handleTimeUpdate = (currentTime: number) => {
+    if (!timestamps) return;
+
+    // Find the most recent timestamp that's less than or equal to the current time
+    const currentTimestamp = timestamps
+      .filter(ts => ts.timestamp_seconds <= currentTime)
+      .sort((a, b) => b.timestamp_seconds - a.timestamp_seconds)[0];
+
+    if (currentTimestamp?.slide_url) {
+      setCurrentSlideUrl(currentTimestamp.slide_url);
+    }
+  };
+
+  // Set initial slide
+  useEffect(() => {
+    if (session?.slides_url) {
+      setCurrentSlideUrl(session.slides_url);
+    }
+  }, [session]);
 
   if (isLoading) {
     return (
@@ -76,9 +115,10 @@ const LearningDashboard = () => {
           <VideoPlayer
             src={session.youtube_url || ""}
             className="aspect-video"
+            onTimeUpdate={handleTimeUpdate}
           />
           <SlideViewer
-            src={session.slides_url || "/placeholder.svg"}
+            src={currentSlideUrl || session.slides_url || "/placeholder.svg"}
             className="aspect-video"
           />
         </div>
