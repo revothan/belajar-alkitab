@@ -10,7 +10,7 @@ interface LMSLayoutProps {
 export function LMSLayout({ children, className }: LMSLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex flex-col w-full bg-background">
         <LMSSidebar />
         <main className={cn("flex-1 overflow-hidden", className)}>
           {children}

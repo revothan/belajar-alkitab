@@ -19,12 +19,11 @@ const menuItems = [
 
 export function LMSSidebar() {
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+    <Sidebar variant="inset" collapsible="none" className="h-16 border-b">
+      <SidebarContent className="h-full py-0">
+        <SidebarGroup className="h-full">
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="flex-row h-full items-center justify-center gap-4">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
