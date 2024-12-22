@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NotesEditorProps {
   className?: string;
@@ -16,10 +17,11 @@ export function NotesEditor({ className, currentTimestampId }: NotesEditorProps)
   const moduleId = searchParams.get('moduleId');
   const sessionId = searchParams.get('sessionId');
   const { toast } = useToast();
+  const { session } = useAuth();
 
   const handleSubmitNotes = async () => {
     try {
-      if (!moduleId || !sessionId || !notes.trim()) {
+      if (!moduleId || !sessionId || !notes.trim() || !session?.user?.id) {
         toast({
           title: "Error",
           description: "Missing required information",
@@ -33,6 +35,7 @@ export function NotesEditor({ className, currentTimestampId }: NotesEditorProps)
         session_id: sessionId,
         timestamp_id: currentTimestampId,
         content: notes.trim(),
+        user_id: session.user.id
       });
 
       if (error) throw error;
