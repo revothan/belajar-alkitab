@@ -8,7 +8,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,7 +43,7 @@ const LearningDashboard = () => {
     enabled: !!sessionId,
   });
 
-  const { data: userProgress } = useQuery({
+  const { data: userProgress, isLoading: isLoadingProgress } = useQuery({
     queryKey: ["user-progress", sessionId, session?.user?.id],
     queryFn: async () => {
       if (!sessionId || !session?.user?.id) return null;
@@ -61,8 +61,8 @@ const LearningDashboard = () => {
     enabled: !!sessionId && !!session?.user?.id,
   });
 
-  const markAsCompleteMutation = useMutation({
-    mutationFn: async () => {
+  const toggleCompleteMutation = useMutation({
+    mutationFn: async (completed: boolean) => {
       if (!session?.user?.id || !sessionId) {
         throw new Error("User must be logged in and session ID must be provided");
       }
@@ -72,24 +72,24 @@ const LearningDashboard = () => {
         .upsert({
           user_id: session.user.id,
           session_id: sessionId,
-          completed: true
+          completed
         }, {
           onConflict: 'user_id,session_id'
         });
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, completed) => {
       toast({
         title: "Success",
-        description: "Session marked as complete!",
+        description: completed ? "Session marked as complete!" : "Session marked as incomplete",
       });
       queryClient.invalidateQueries({ queryKey: ["user-progress"] });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to mark session as complete",
+        description: "Failed to update session status",
         variant: "destructive",
       });
     },
@@ -115,7 +115,6 @@ const LearningDashboard = () => {
   const handleTimeUpdate = (currentTime: number) => {
     if (!timestamps) return;
 
-    // Find the most recent timestamp that's less than or equal to the current time
     const currentTimestamp = timestamps
       .filter(ts => ts.timestamp_seconds <= currentTime)
       .sort((a, b) => b.timestamp_seconds - a.timestamp_seconds)[0];
@@ -126,7 +125,6 @@ const LearningDashboard = () => {
     }
   };
 
-  // Set initial slide
   useEffect(() => {
     if (sessionData?.slides_url) {
       setCurrentSlideUrl(sessionData.slides_url);
@@ -168,12 +166,16 @@ const LearningDashboard = () => {
             </Button>
 
             <Button
-              onClick={() => markAsCompleteMutation.mutate()}
-              disabled={userProgress?.completed || markAsCompleteMutation.isPending}
+              onClick={() => toggleCompleteMutation.mutate(!userProgress?.completed)}
+              disabled={toggleCompleteMutation.isPending}
               variant={userProgress?.completed ? "secondary" : "default"}
             >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              {userProgress?.completed ? "Completed" : "Mark as Complete"}
+              {userProgress?.completed ? (
+                <XCircle className="mr-2 h-4 w-4" />
+              ) : (
+                <CheckCircle className="mr-2 h-4 w-4" />
+              )}
+              {userProgress?.completed ? "Mark as Incomplete" : "Mark as Complete"}
             </Button>
           </div>
 
