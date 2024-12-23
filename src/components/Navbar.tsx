@@ -8,6 +8,13 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
+type NavButton = {
+  icon: React.ElementType;
+  label: string;
+  onClick: () => Promise<void>;
+  variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+};
+
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,12 +67,12 @@ export function Navbar() {
     }
   };
 
-  const getNavButtons = () => {
+  const getNavButtons = (): NavButton[] => {
     if (!session) {
       return [{
         icon: User,
         label: "Login",
-        onClick: () => {
+        onClick: async () => {
           navigate('/login');
           setIsOpen(false);
         },
@@ -73,7 +80,7 @@ export function Navbar() {
       }];
     }
 
-    const commonButtons = [
+    const commonButtons: NavButton[] = [
       {
         icon: LogOut,
         label: "Logout",
@@ -87,7 +94,7 @@ export function Navbar() {
       commonButtons.unshift({
         icon: School,
         label: "Teacher Panel",
-        onClick: () => {
+        onClick: async () => {
           navigate('/teacher-dashboard');
           setIsOpen(false);
         },
@@ -100,7 +107,7 @@ export function Navbar() {
         {
           icon: GraduationCap,
           label: "Learning",
-          onClick: () => {
+          onClick: async () => {
             navigate('/modules');
             setIsOpen(false);
           },
@@ -109,7 +116,7 @@ export function Navbar() {
         {
           icon: FileText,
           label: "My Notes",
-          onClick: () => {
+          onClick: async () => {
             navigate('/my-notes');
             setIsOpen(false);
           },
@@ -118,7 +125,7 @@ export function Navbar() {
         {
           icon: BookOpen,
           label: "Teacher Note",
-          onClick: () => {
+          onClick: async () => {
             navigate('/teacher-note');
             setIsOpen(false);
           },
@@ -127,7 +134,7 @@ export function Navbar() {
         {
           icon: Scroll,
           label: "Transcript",
-          onClick: () => {
+          onClick: async () => {
             navigate('/transcript');
             setIsOpen(false);
           },
@@ -136,7 +143,7 @@ export function Navbar() {
         {
           icon: Book,
           label: "Reflection",
-          onClick: () => {
+          onClick: async () => {
             navigate('/reflection');
             setIsOpen(false);
           },
@@ -145,7 +152,7 @@ export function Navbar() {
         {
           icon: Download,
           label: "Download",
-          onClick: () => {/* handle download */},
+          onClick: async () => {/* handle download */},
           variant: "ghost"
         },
         ...commonButtons
@@ -159,7 +166,7 @@ export function Navbar() {
         {
           icon: GraduationCap,
           label: "Learning",
-          onClick: () => {
+          onClick: async () => {
             navigate('/modules');
             setIsOpen(false);
           },
@@ -168,7 +175,7 @@ export function Navbar() {
         {
           icon: FileText,
           label: "My Notes",
-          onClick: () => {
+          onClick: async () => {
             navigate('/my-notes');
             setIsOpen(false);
           },
