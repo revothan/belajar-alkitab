@@ -13,19 +13,19 @@ export function Footer() {
       icon: Mail,
       label: "Email",
       href: "mailto:contact@example.com",
-      variant: "ghost"
+      variant: "ghost" as const // Fixed type by adding 'as const'
     },
     {
       icon: Facebook,
       label: "Facebook",
       href: "https://facebook.com/belajaralkitab",
-      variant: "ghost"
+      variant: "ghost" as const
     },
     {
       icon: Instagram,
       label: "Instagram",
       href: "https://instagram.com/belajaralkitab",
-      variant: "ghost"
+      variant: "ghost" as const
     }
   ];
 
