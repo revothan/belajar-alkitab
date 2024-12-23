@@ -8,11 +8,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Modules = () => {
   const navigate = useNavigate();
   const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
   const [expandedSessions, setExpandedSessions] = useState<{ [key: string]: boolean }>({});
+  const { session } = useAuth();
 
   const { data: modules, isLoading: isLoadingModules } = useQuery({
     queryKey: ["modules"],
@@ -30,7 +32,23 @@ const Modules = () => {
     },
   });
 
-  if (isLoadingModules) {
+  const { data: userProgress, isLoading: isLoadingProgress } = useQuery({
+    queryKey: ["user-progress", session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from("user_progress")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user?.id,
+  });
+
+  if (isLoadingModules || isLoadingProgress) {
     return (
       <LMSLayout>
         <div className="container max-w-4xl py-6 space-y-6">
@@ -52,8 +70,19 @@ const Modules = () => {
     );
   }
 
-  // Sort sessions by order_index to ensure they're displayed in the correct order
   const sortedSessions = currentModule.sessions?.sort((a, b) => a.order_index - b.order_index);
+
+  const calculateModuleProgress = () => {
+    if (!sortedSessions || !userProgress) return 0;
+    const completedSessions = userProgress.filter(
+      progress => progress.completed && sortedSessions.some(session => session.id === progress.session_id)
+    ).length;
+    return Math.round((completedSessions / sortedSessions.length) * 100);
+  };
+
+  const isSessionCompleted = (sessionId: string) => {
+    return userProgress?.some(progress => progress.session_id === sessionId && progress.completed) || false;
+  };
 
   const toggleSessionDescription = (sessionId: string) => {
     setExpandedSessions((prev) => ({
@@ -61,6 +90,8 @@ const Modules = () => {
       [sessionId]: !prev[sessionId],
     }));
   };
+
+  const moduleProgress = calculateModuleProgress();
 
   return (
     <LMSLayout>
@@ -94,8 +125,8 @@ const Modules = () => {
         <div className="space-y-4">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
-              <Progress value={0} className="w-32" />
-              <span className="text-sm text-muted-foreground">0% Complete</span>
+              <Progress value={moduleProgress} className="w-32" />
+              <span className="text-sm text-muted-foreground">{moduleProgress}% Complete</span>
             </div>
             {sortedSessions?.[0] && (
               <Button 
@@ -130,7 +161,14 @@ const Modules = () => {
                         />
                       </div>
                       <div className="space-y-1">
-                        <h3 className="font-medium">Session {index + 1}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-medium">Session {index + 1}</h3>
+                          {isSessionCompleted(session.id) && (
+                            <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                              Completed
+                            </span>
+                          )}
+                        </div>
                         <h4 className="font-medium">{session.title}</h4>
                         <p className={`text-sm text-muted-foreground ${expandedSessions[session.id] ? "" : "line-clamp-2"}`}>
                           {session.description}
@@ -139,7 +177,10 @@ const Modules = () => {
                           variant="link" 
                           size="sm" 
                           className="p-0"
-                          onClick={() => toggleSessionDescription(session.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSessionDescription(session.id);
+                          }}
                         >
                           {expandedSessions[session.id] ? "Show Less" : "Read More"}
                         </Button>
