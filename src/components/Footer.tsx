@@ -1,4 +1,4 @@
-import { Github, Mail, Facebook, Instagram } from "lucide-react";
+import { Mail, Facebook, Instagram } from "lucide-react";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,20 +13,17 @@ export function Footer() {
       icon: Mail,
       label: "Email",
       href: "mailto:contact@example.com",
-      variant: "ghost" as const // Fixed type by adding 'as const'
     },
     {
       icon: Facebook,
       label: "Facebook",
       href: "https://facebook.com/belajaralkitab",
-      variant: "ghost" as const
     },
     {
       icon: Instagram,
       label: "Instagram",
       href: "https://instagram.com/belajaralkitab",
-      variant: "ghost" as const
-    }
+    },
   ];
 
   const quickLinks = [
@@ -41,73 +38,66 @@ export function Footer() {
     {
       label: "Profile",
       path: "/profile",
-    }
+    },
   ];
 
   return (
-    <footer className="w-full border-t bg-background mt-auto">
-      <div className="container py-8 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* About Section */}
-          <div>
-            <h3 className="font-semibold mb-4">About Us</h3>
-            <p className="text-sm text-muted-foreground">
-              Belajar Alkitab adalah Platform untuk Bertumbuh dalam Iman melalui Pembelajaran Alkitab yang Mudah dan Interaktif.
+    <footer className="w-full border-t bg-white mt-auto">
+      <div className="container max-w-6xl mx-auto py-8 px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+          {/* Logo and About */}
+          <div className="text-center md:text-left">
+            <h3 className="font-bold text-lg mb-2">Belajar Alkitab</h3>
+            <p className="text-sm text-gray-600 max-w-sm">
+              Platform untuk Bertumbuh dalam Iman melalui Pembelajaran Alkitab
+              yang Mudah dan Interaktif.
             </p>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              {session && quickLinks.map((link, index) => (
-                <li key={index}>
-                  <Button
-                    variant="link"
-                    className="h-auto p-0 text-sm text-muted-foreground hover:text-primary"
-                    onClick={() => navigate(link.path)}
-                  >
-                    {link.label}
-                  </Button>
-                </li>
-              ))}
-              {!session && (
-                <li>
-                  <Button
-                    variant="link"
-                    className="h-auto p-0 text-sm text-muted-foreground hover:text-primary"
-                    onClick={() => navigate('/login')}
-                  >
-                    Login
-                  </Button>
-                </li>
-              )}
-            </ul>
-          </div>
-
-          {/* Social Links */}
-          <div>
-            <h3 className="font-semibold mb-4">Connect With Us</h3>
-            <div className="flex gap-2 flex-wrap">
-              {socialLinks.map((link, index) => (
+          {session && (
+            <div className="flex gap-6">
+              {quickLinks.map((link, index) => (
                 <Button
                   key={index}
-                  variant={link.variant}
-                  size="sm"
-                  className="gap-1.5 h-8"
-                  onClick={() => window.open(link.href, '_blank')}
+                  variant="ghost"
+                  className="text-sm text-gray-600 hover:text-black"
+                  onClick={() => navigate(link.path)}
                 >
-                  <link.icon className="h-3 w-3" />
-                  <span className="text-xs">{link.label}</span>
+                  {link.label}
                 </Button>
               ))}
             </div>
+          )}
+          {!session && (
+            <Button
+              variant="ghost"
+              className="text-sm text-gray-600 hover:text-black"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </Button>
+          )}
+
+          {/* Social Links */}
+          <div className="flex gap-4">
+            {socialLinks.map((link, index) => (
+              <Button
+                key={index}
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 text-gray-600 hover:text-black"
+                onClick={() => window.open(link.href, "_blank")}
+              >
+                <link.icon className="h-4 w-4" />
+              </Button>
+            ))}
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-8 pt-4 border-t text-center">
-          <p className="text-sm text-muted-foreground">
+        {/* Copyright - Minimal Version */}
+        <div className="mt-8 pt-6 border-t text-center">
+          <p className="text-sm text-gray-500">
             © {currentYear} Belajar Alkitab. All rights reserved.
           </p>
         </div>
@@ -115,3 +105,6 @@ export function Footer() {
     </footer>
   );
 }
+
+export default Footer;
+

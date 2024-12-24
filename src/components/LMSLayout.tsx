@@ -13,7 +13,7 @@ export function LMSLayout({ children, className }: LMSLayoutProps) {
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full bg-background">
         <Navbar />
-        <main className={cn("flex-1 overflow-hidden py-20", className)}>
+        <main className={cn("flex-1 overflow-hidden", className)}>
           {children}
         </main>
         <Footer />
@@ -21,3 +21,4 @@ export function LMSLayout({ children, className }: LMSLayoutProps) {
     </SidebarProvider>
   );
 }
+
