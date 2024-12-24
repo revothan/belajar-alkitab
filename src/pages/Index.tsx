@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { LMSLayout } from "@/components/LMSLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { User2, Video, Book, MessageCircle, ChevronRight } from "lucide-react";
+import { StatementOfFaith } from "@/components/StatementOfFaith";
 
 const Index = () => {
   return (
@@ -113,6 +114,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Statement of Faith Section */}
+      <StatementOfFaith />
+
       {/* Instructor Profile Section with Modern Card Design */}
       <section className="py-24 bg-gray-50">
         <div className="container max-w-7xl mx-auto px-4">
@@ -168,4 +172,3 @@ const Index = () => {
 };
 
 export default Index;
-
